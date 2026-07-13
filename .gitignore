@@ -1,0 +1,55 @@
+# ─── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env/
+.venv/
+*.egg-info/
+dist/
+build/
+*.egg
+.pytest_cache/
+
+# ─── Node / Frontend ─────────────────────────────────────────────────────────
+node_modules/
+dist/
+.cache/
+*.log
+npm-debug.log*
+
+# ─── Environment Files ───────────────────────────────────────────────────────
+# Keep .env.example but NOT real .env files (they contain secrets)
+.env
+.env.local
+.env.production
+
+# ─── ML Models (too large for GitHub) ───────────────────────────────────────
+# We commit the .partXXX chunks instead (each is under 49 MB)
+models/*.keras
+
+# ─── Uploads & Generated Heatmaps ───────────────────────────────────────────
+backend/uploads/
+backend/public/heatmaps/
+
+# ─── OS Artefacts ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ─── IDE ─────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.iml
+
+# ─── Test/scratch scripts ────────────────────────────────────────────────────
+model_inference/test_ram.py
+model_inference/test_model_directly.py
+
+#------FILES-----------------
+
+DEPLOYMENT_GUIDE.md
