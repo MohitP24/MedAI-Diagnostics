@@ -1,0 +1,110 @@
+.upload-form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Dropzone */
+.dropzone {
+    position: relative;
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color var(--transition-normal);
+    border: 2px dashed rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.2);
+}
+
+.dropzone:hover {
+    border-color: rgba(255,255,255,0.2);
+}
+
+.dropzone.dragging {
+    border-color: var(--color-primary);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.dropzone.has-preview {
+    padding: 0;
+    min-height: 400px;
+    border: 1px solid var(--glass-border);
+    cursor: default;
+}
+
+/* Preview */
+.preview-container {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+}
+
+.preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.preview-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.preview-container:hover .preview-overlay {
+    opacity: 1;
+}
+
+.preview-filename {
+    color: white;
+    font-weight: 500;
+    font-size: 0.95rem;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dropzone {
+        min-height: 250px;
+    }
+
+    .dropzone.has-preview {
+        min-height: 300px;
+    }
+
+    .form-controls {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    .form-controls .btn-primary {
+        width: 100%;
+    }
+
+    .preview-overlay {
+        opacity: 1;
+        padding: 1rem;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0,0,0,0.4) 100%);
+    }
+
+    .preview-filename {
+        max-width: 150px;
+    }
+}
