@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  # --- Python Flask ML Inference Server ---
+  ml_server:
+    build:
+      context: ./model_inference
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    volumes:
+      # Mount the models directory (not committed to git)
+      - ./models:/app/models:ro
+      - ./backend/public/heatmaps:/app/backend/public/heatmaps
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # --- Node.js API Backend ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./backend/.env
+    environment:
+      - PYTHON_API_URL=http://ml_server:5001
+    depends_on:
+      ml_server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # --- React Frontend (Production Build) ---
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  default:
+    name: medai-network
