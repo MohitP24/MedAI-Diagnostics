@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, AlertTriangle, Info, RefreshCw, BarChart3, Download } from 'lucide-react';
 import ImageCanvas from './ImageCanvas';
 import ModelComparisonChart from './ModelComparisonChart';
+import { api } from '../lib/api';
 import './ResultView.css';
 
 interface ModelResult {
@@ -30,7 +31,11 @@ interface ResultViewProps {
     onReset: () => void;
 }
 
-const ResultView: React.FC<ResultViewProps> = ({ models, combined, originalImage, onReset }) => {
+const ResultView: React.FC<ResultViewProps> = ({ models: rawModels, combined: rawCombined, originalImage, onReset }) => {
+    // Safety check: if rawModels contains the root python response structure, unwrap it.
+    const models = rawModels?.models && rawModels?.status ? (rawModels.models as any) : rawModels;
+    const combined = (rawModels?.combined as any) || rawCombined;
+
     const [selectedModel, setSelectedModel] = useState<string>(models && Object.keys(models).length > 0 ? Object.keys(models)[0] : '');
 
     const getClassColor = (className: string): string => {
@@ -55,8 +60,9 @@ const ResultView: React.FC<ResultViewProps> = ({ models, combined, originalImage
     };
 
     const downloadImage = (url: string, filename: string) => {
+        const fullUrl = url.startsWith('http') ? url : api(url);
         const link = document.createElement('a');
-        link.href = url;
+        link.href = fullUrl;
         link.download = filename;
         document.body.appendChild(link);
         link.click();
@@ -74,7 +80,7 @@ const ResultView: React.FC<ResultViewProps> = ({ models, combined, originalImage
                 </button>
             </div>
 
-            <div className="grid grid-2" style={{ alignItems: 'flex-start' }}>
+            <div className="result-grid-layout">
                 {/* Left Column: Diagnostics & Stats */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                     
@@ -82,6 +88,7 @@ const ResultView: React.FC<ResultViewProps> = ({ models, combined, originalImage
                     <motion.div 
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
+                        whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(0,0,0,0.4)', borderColor: 'rgba(255,255,255,0.2)' }}
                         className="glass-card"
                         style={{ padding: '2rem', border: `1px solid ${getClassColor(combined.voting)}`, background: `linear-gradient(145deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 100%)` }}
                     >
@@ -113,6 +120,7 @@ const ResultView: React.FC<ResultViewProps> = ({ models, combined, originalImage
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
+                            whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(0,0,0,0.4)' }}
                             className="glass-card"
                         >
                             <div className="card-icon-row" style={{ marginBottom: '1.5rem' }}>
@@ -159,7 +167,7 @@ const ResultView: React.FC<ResultViewProps> = ({ models, combined, originalImage
                                     </div>
 
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                        {models[selectedModel].probs && Object.entries(models[selectedModel].probs).map(([className, prob]) => (
+                                        {models[selectedModel].probs && Object.entries(models[selectedModel].probs as Record<string, number>).map(([className, prob]) => (
                                             <div key={className} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                                 <span style={{ width: '80px', fontSize: '0.9rem', color: 'var(--text-secondary)', textTransform: 'capitalize' }}>{className}</span>
                                                 <div style={{ flex: 1, height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
@@ -180,7 +188,13 @@ const ResultView: React.FC<ResultViewProps> = ({ models, combined, originalImage
                     )}
 
                     {hasMultipleModels && (
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card">
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }} 
+                            animate={{ opacity: 1, y: 0 }} 
+                            transition={{ delay: 0.3 }} 
+                            whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(0,0,0,0.4)' }}
+                            className="glass-card"
+                        >
                             <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Model Comparison</h3>
                             <ModelComparisonChart models={models} />
                         </motion.div>
@@ -215,8 +229,8 @@ const ResultView: React.FC<ResultViewProps> = ({ models, combined, originalImage
                         <div style={{ background: '#000', minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             {models[selectedModel]?.gradcam_url ? (
                                 <ImageCanvas
-                                    originalImageUrl={originalImage}
-                                    overlayImageUrl={models[selectedModel].gradcam_url!}
+                                    originalImageUrl={originalImage.startsWith('http') || originalImage.startsWith('data:') ? originalImage : api(originalImage)}
+                                    overlayImageUrl={models[selectedModel].gradcam_url.startsWith('http') ? models[selectedModel].gradcam_url! : api(models[selectedModel].gradcam_url!)}
                                 />
                             ) : (
                                 <div style={{ color: 'var(--text-tertiary)' }}>Visualization not available</div>

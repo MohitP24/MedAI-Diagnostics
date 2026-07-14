@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Calendar, FileImage, Cpu } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import ResultView from '../components/ResultView';
+import { api } from '../lib/api';
 import '../styles/pages.css';
 
 export default function PredictionDetail() {
@@ -17,15 +18,19 @@ export default function PredictionDetail() {
     useEffect(() => {
         const fetchPrediction = async () => {
             try {
-                const res = await fetch(`/api/predictions/${id}`, {
+                const res = await fetch(api(`/api/v1/predictions/${id}`), {
                     headers: { 'Authorization': `Bearer ${auth?.user?.token}` }
                 });
+                if (res.status === 401) {
+                    auth?.logout();
+                    return;
+                }
                 if (!res.ok) {
                     const data = await res.json();
                     throw new Error(data.message || 'Failed to load prediction');
                 }
                 const data = await res.json();
-                setPrediction(data);
+                setPrediction(data.data);
             } catch (err: any) {
                 setError(err.message);
             } finally {
@@ -100,12 +105,12 @@ export default function PredictionDetail() {
             </motion.div>
 
             {/* Check if we have full model details to show the rich view */}
-            {prediction.modelDetails && Object.keys(prediction.modelDetails).length > 0 ? (
+            {prediction.modelDetails && prediction.modelDetails.models ? (
                     <ResultView
-                        models={prediction.modelDetails}
-                        combined={{
+                        models={prediction.modelDetails.models}
+                        combined={prediction.modelDetails.combined || {
                             voting: prediction.ensemblePrediction,
-                            notes: `${prediction.modelsUsed} ensemble — ${Object.keys(prediction.modelDetails).length} model(s)`,
+                            notes: `${prediction.modelsUsed} ensemble — ${Object.keys(prediction.modelDetails.models).length} model(s)`,
                             avg_confidence: prediction.confidence,
                         }}
                         originalImage={prediction.originalImagePath || ''}

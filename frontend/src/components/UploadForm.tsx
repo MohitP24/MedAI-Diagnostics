@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { UploadCloud, FileImage, X, Zap } from 'lucide-react';
 import './UploadForm.css';
 import { AuthContext } from '../context/AuthContext';
+import { api } from '../lib/api';
 
 interface UploadFormProps {
     onUploadStart: () => void;
@@ -79,14 +80,14 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUploadStart, onUploadComplete
         try {
             const formData = new FormData();
             formData.append('image', selectedFile);
-            formData.append('model', modelSelection);
+            formData.append('models', modelSelection);
 
             const headers: Record<string, string> = {};
             if (auth?.user?.token) {
                 headers['Authorization'] = `Bearer ${auth.user.token}`;
             }
 
-            const response = await fetch('/api/predictions', {
+            const response = await fetch(api('/api/v1/predictions'), {
                 method: 'POST',
                 headers: headers,
                 body: formData,
@@ -98,7 +99,11 @@ const UploadForm: React.FC<UploadFormProps> = ({ onUploadStart, onUploadComplete
             }
 
             const result = await response.json();
-            onUploadComplete(result);
+            onUploadComplete({
+                models: result.data.modelDetails.models,
+                combined: result.data.modelDetails.combined,
+                original_image: previewUrl
+            });
 
         } catch (error: any) {
             onError(error.message || 'Secure connection to inference engine interrupted.');
