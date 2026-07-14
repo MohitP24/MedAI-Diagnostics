@@ -7,6 +7,10 @@
     {
       "source": "/heatmaps/:path*",
       "destination": "https://medai-backend-auae.onrender.com/heatmaps/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
