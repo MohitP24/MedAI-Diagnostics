@@ -17,7 +17,7 @@
 }
 
 .header-content {
-    max-width: 1200px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 1.25rem 1.5rem;
     display: flex;
@@ -120,7 +120,7 @@
 
 /* Analysis Layout Container */
 .analysis-layout {
-    max-width: 1200px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 2rem 1.5rem 6rem;
     display: flex;
@@ -195,7 +195,7 @@
 }
 
 .footer-content {
-    max-width: 1200px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 0 1.5rem;
     display: flex;

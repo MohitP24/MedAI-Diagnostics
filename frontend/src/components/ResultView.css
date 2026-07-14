@@ -1,7 +1,7 @@
 .result-view-container {
-    max-width: 1280px;
+    width: 100%;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 1rem 0;
 }
 
 /* Header */
@@ -235,6 +235,19 @@
 .canvas-actions {
     display: flex;
     gap: 0.75rem;
+}
+
+.result-grid-layout {
+    display: grid;
+    grid-template-columns: 450px 1fr;
+    gap: 3rem;
+    align-items: flex-start;
+}
+
+@media (max-width: 1200px) {
+    .result-grid-layout {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Responsive */
