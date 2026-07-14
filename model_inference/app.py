@@ -175,6 +175,10 @@ def determine_combined(model_results: dict) -> dict:
 app = Flask(__name__)
 CORS(app)
 
+# Run scan automatically when app is imported (needed for Gunicorn)
+scan_available_models()
+
+
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -221,5 +225,4 @@ def predict():
 
 
 if __name__ == '__main__':
-    scan_available_models()
     app.run(host='0.0.0.0', port=PORT, debug=False, threaded=False)
