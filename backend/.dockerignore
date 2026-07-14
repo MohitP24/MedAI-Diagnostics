@@ -1,0 +1,11 @@
+node_modules/
+tmp_uploads/
+logs/
+.env
+.git
+.github
+Dockerfile
+.dockerignore
+package-lock.json
+public/heatmaps/*
+!public/heatmaps/.gitkeep
