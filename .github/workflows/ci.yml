@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+    env:
+      MONGO_URI: mongodb://localhost:27017/medai_test
+      JWT_SECRET: super_secret_test_key_12345
+      PORT: 3001
+      PYTHON_API_URL: http://localhost:5001
+      FRONTEND_URL: http://localhost:5173
+    
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      
+      - name: Install backend dependencies
+        run: cd backend && npm ci
+      
+      # We just start the server and run a quick curl to check if it boots successfully
+      - name: Test backend boot
+        run: |
+          cd backend
+          npm start &
+          sleep 5
+          curl -f http://localhost:3001/health || exit 1
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+      
+      - name: Build frontend
+        run: cd frontend && npm run build
