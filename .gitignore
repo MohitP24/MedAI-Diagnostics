@@ -34,6 +34,7 @@ models/*.keras
 # ─── Uploads & Generated Heatmaps ───────────────────────────────────────────
 backend/uploads/
 backend/public/heatmaps/
+backend/tmp_uploads/
 
 # ─── OS Artefacts ────────────────────────────────────────────────────────────
 .DS_Store
