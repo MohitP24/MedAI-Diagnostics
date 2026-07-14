@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { motion } from 'framer-motion';
 import { Activity, Database, History, ChevronRight } from 'lucide-react';
+import { api } from '../lib/api';
 import '../styles/pages.css';
 
 interface Prediction {
@@ -36,19 +37,28 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Fetch User Predictions
-                const resPreds = await fetch('/api/predictions', {
+                const resPreds = await fetch(api('/api/v1/predictions'), {
                     headers: {
                         'Authorization': `Bearer ${auth?.user?.token}`
                     }
                 });
+                
+                if (resPreds.status === 401) {
+                    auth?.logout();
+                    return;
+                }
+
                 const dataPreds = await resPreds.json();
-                setPredictions(dataPreds);
+                setPredictions(dataPreds.data || []);
 
                 // Fetch Global Stats
-                const resStats = await fetch('/api/predictions/stats');
+                const resStats = await fetch(api('/api/v1/predictions/stats'), {
+                    headers: {
+                        'Authorization': `Bearer ${auth?.user?.token}`
+                    }
+                });
                 const dataStats = await resStats.json();
-                setStats(dataStats);
+                setStats(dataStats.data || null);
             } catch (error) {
                 console.error("Error fetching dashboard data", error);
             } finally {

@@ -1,7 +1,8 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
+import { api } from '../lib/api';
 import { Activity, LogIn, Mail, Lock } from 'lucide-react';
 import '../styles/pages.css';
 
@@ -17,13 +18,20 @@ export default function Login() {
 
     const successMessage = location.state?.message;
 
+    // Redirect if already logged in
+    useEffect(() => {
+        if (auth?.user) {
+            navigate('/');
+        }
+    }, [auth?.user, navigate]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
         try {
-            const res = await fetch('/api/auth/login', {
+            const res = await fetch(api('/api/v1/auth/login'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
@@ -35,7 +43,10 @@ export default function Login() {
                 throw new Error(data.message || 'Login failed');
             }
 
-            auth?.login(data);
+            auth?.login({
+                ...data.user,
+                token: data.token || data.accessToken
+            });
             navigate('/');
         } catch (err: any) {
             setError(err.message);

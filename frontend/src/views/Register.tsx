@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { AuthContext } from '../context/AuthContext';
+import { api } from '../lib/api';
 import { Activity, UserPlus, Mail, Lock, User } from 'lucide-react';
 import '../styles/pages.css';
 
@@ -12,7 +14,15 @@ export default function Register() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const auth = useContext(AuthContext);
     const navigate = useNavigate();
+
+    // Redirect if already logged in
+    useEffect(() => {
+        if (auth?.user) {
+            navigate('/');
+        }
+    }, [auth?.user, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -25,7 +35,7 @@ export default function Register() {
         setLoading(true);
 
         try {
-            const res = await fetch('/api/auth/register', {
+            const res = await fetch(api('/api/v1/auth/register'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password }),
