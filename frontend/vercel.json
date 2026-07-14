@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://medai-backend.onrender.com/api/:path*"
+      "destination": "https://medai-backend-auae.onrender.com/api/:path*"
     },
     {
       "source": "/heatmaps/:path*",
-      "destination": "https://medai-backend.onrender.com/heatmaps/:path*"
+      "destination": "https://medai-backend-auae.onrender.com/heatmaps/:path*"
     }
   ]
 }
